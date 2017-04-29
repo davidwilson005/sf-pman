@@ -2,13 +2,16 @@
 
 namespace AppBundle\Entity;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="binder")
+ * @ORM\Entity(repositoryClass="Gedmo\Tree\Entity\Repository\MaterializedPathRepository")
  * @Gedmo\SoftDeleteable(fieldName="deletedOn", timeAware=false)
+ * @Gedmo\Tree(type="materializedPath")
  */
 class Binder
 {
@@ -16,9 +19,17 @@ class Binder
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      * @ORM\Column(type="integer")
+     * @Gedmo\TreePathSource
      * @var int
      */
     private $id;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     * @Gedmo\TreePath(separator="/", startsWithSeparator=false, endsWithSeparator=false)
+     * @var string
+     */
+    private $path;
 
     /**
      * @ORM\Column(type="string")
@@ -27,10 +38,25 @@ class Binder
     private $name;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\ManyToOne(targetEntity="Binder", inversedBy="children")
+     * @ORM\JoinColumn(referencedColumnName="id", onDelete="CASCADE")
+     * @Gedmo\TreeParent
+     * @var Binder
+     */
+    private $parent;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Gedmo\TreeLevel
      * @var int
      */
-    private $parentId;
+    private $level;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Binder", mappedBy="parent")
+     * @var Collection
+     */
+    private $children;
 
     /**
      * @ORM\Column(type="datetime")
@@ -80,17 +106,34 @@ class Binder
         return $this;
     }
 
-    /**
-     * @param  int    $parentId
-     * @return Binder
-     */
-    public function setParentId($parentId)
+    public function setParent(Binder $parent = null)
     {
-        $this->parentId = $parentId;
-
-        return $this;
+        $this->parent = $parent;
     }
 
+    public function getParent()
+    {
+        return $this->parent;
+    }
 
+    public function setPath($path)
+    {
+        $this->path = $path;
+    }
+
+    public function getPath()
+    {
+        return $this->path;
+    }
+
+    public function getLevel()
+    {
+        return $this->level;
+    }
+
+    public function getChildren()
+    {
+        return $this->children;
+    }
 
 }
