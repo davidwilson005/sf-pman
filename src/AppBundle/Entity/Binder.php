@@ -12,6 +12,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * @ORM\Entity(repositoryClass="Gedmo\Tree\Entity\Repository\MaterializedPathRepository")
  * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
  * @Gedmo\Tree(type="materializedPath")
+ * @Gedmo\Loggable
  */
 class Binder
 {
@@ -33,6 +34,7 @@ class Binder
 
     /**
      * @ORM\Column(type="string")
+     * @Gedmo\Versioned
      * @var string
      */
     private $name;
@@ -114,6 +116,10 @@ class Binder
         return $this->name;
     }
 
+    public function getLevel()
+    {
+        return $this->level;
+    }
 
     /**
      * @param  string $name
@@ -129,30 +135,5 @@ class Binder
     public function setParent(Binder $parent = null)
     {
         $this->parent = $parent;
-    }
-
-    public function getParent()
-    {
-        return $this->parent;
-    }
-
-    public function setPath($path)
-    {
-        $this->path = $path;
-    }
-
-    public function getPath()
-    {
-        return $this->path;
-    }
-
-    public function getLevel()
-    {
-        return $this->level;
-    }
-
-    public function getChildren()
-    {
-        return $this->children;
     }
 }

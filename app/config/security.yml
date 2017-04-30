@@ -10,7 +10,7 @@ security:
         in_memory:
             memory:
                 users:
-                    ryan:
+                    dave:
                         password: password
                         roles: 'ROLE_USER'
                     admin:

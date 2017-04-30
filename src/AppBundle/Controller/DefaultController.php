@@ -46,6 +46,22 @@ class DefaultController extends Controller
     }
 
     /**
+     * @Route("/edit/{id}")
+     *
+     * @param  Binder   $binder
+     * @return Response
+     */
+    public function editAction(Binder $binder)
+    {
+        $binder->setName('Test Edit ' . date('m/d/Y h:is: A'));
+
+        $this->getEm()->persist($binder);
+        $this->getEm()->flush();
+
+        return $this->displayMessage('Binder has been edited');
+    }
+
+    /**
      * @Route("/remove/{id}")
      *
      * @param  Binder   $binder
