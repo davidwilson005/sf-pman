@@ -3,23 +3,41 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Binder;
-use Doctrine\ORM\EntityNotFoundException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class DefaultController extends Controller
 {
     /**
-     * @Route("/add")
+     * @Route("/admin")
+     *
      * @return Response
      */
-    public function addAction(Request $request)
+    public function adminAction()
+    {
+        return $this->displayMessage('admin');
+    }
+
+    /**
+     * @Route("/")
+     *
+     * @return Response
+     */
+    public function indexAction()
+    {
+        return $this->displayMessage('index');
+    }
+
+    /**
+     * @Route("/add")
+     *
+     * @return Response
+     */
+    public function addAction()
     {
         $binder = new Binder();
-        $binder->setName('Test' . rand(1, 100))
-            ->setParentId(0);
+        $binder->setName('Test' . rand(1, 100));
 
         $this->getEm()->persist($binder);
         $this->getEm()->flush();
@@ -28,36 +46,27 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/remove/{binderId}")
-     * @throws EntityNotFoundException
+     * @Route("/remove/{id}")
+     *
+     * @param  Binder   $binder
      * @return Response
      */
-    public function removeAction($binderId)
+    public function removeAction(Binder $binder)
     {
-        $binder = $this->getEm()->find('AppBundle:Binder', $binderId);
-
-        if ( ! $binder) {
-            throw new EntityNotFoundException('Binder not found');
-        }
-
         $this->getEm()->remove($binder);
         $this->getEm()->flush();
-
 
         return $this->displayMessage('Binder has been removed');
     }
 
     /**
      * @Route("/list")
+     *
      * @return Response
      */
     public function listAction()
     {
-        //$binders = $this->getEm()->getRepository('AppBundle:Binder')->findAll();
-
-        $binders = $this->getEm()
-            ->createQuery('SELECT b FROM AppBundle:Binder b WHERE b.deletedOn IS NULL')
-            ->getResult();
+        $binders = $this->getEm()->getRepository('AppBundle:Binder')->findAll();
 
         $message = '';
         foreach ($binders as $binder) {
@@ -68,19 +77,14 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/show/{binderId}")
-     * @throws EntityNotFoundException
+     * @Route("/show/{id}")
+     *
+     * @param  Binder   $binder
      * @return Response
      */
-    public function showAction($binderId)
+    public function showAction(Binder $binder)
     {
-        $binder = $this->getEm()->find('AppBundle:Binder', $binderId);
-
-        if ( ! $binder) {
-            throw new EntityNotFoundException('Binder not found');
-        }
-
-        $message = 'ID: ' . $binder->getId() . "<br />" .
+        $message = 'ID: '   . $binder->getId() . "<br />" .
                    'Name: ' . $binder->getName() . "<br />";
 
         return $this->displayMessage($message);
@@ -88,6 +92,8 @@ class DefaultController extends Controller
 
     /**
      * @Route("/createtree")
+     *
+     * @return Response
      */
     public function createTreeAction()
     {
@@ -137,15 +143,16 @@ class DefaultController extends Controller
      */
     public function listTreeAction()
     {
-        /* $binders = $this->getEm()->getRepository('AppBundle:Binder')->getTree();
+         $binders = $this->getEm()->getRepository('AppBundle:Binder')->getTree();
 
         foreach ($binders as $binder) {
             for ($i = 0; $i <= $binder->getLevel(); $i++) {
                 echo "&nbsp;&nbsp;&nbsp;";
             }
             echo $binder->getName() . "<br />";
-        }*/
+        }
 
+        /*
         $binder = $this->getEm()->find('AppBundle:Binder', 108);
 
         $path = $this->getEm()->getRepository('AppBundle:Binder')->getChildren($binder);
@@ -154,22 +161,23 @@ class DefaultController extends Controller
                 echo "&nbsp;&nbsp;&nbsp;";
             }
             echo $p->getName() . '<br />';
-        }
+        }*/
 
         return $this->displayMessage();
     }
 
-    public function walkTree(Binder $binder, $indent = 0) {
+    /**
+     * @Route("/move")
+     */
+    public function move()
+    {
+        $manual = $this->getEm()->find('AppBundle:Binder', 1);
 
+        $binder = $this->getEm()->find('AppBundle:Binder', 14);
 
-        echo $binder->getName() . "<br />";
+        $manual->setParent($binder);
 
-        $indent++;
-        foreach ($binder->getChildren() as $child) {
-            $this->walkTree($child, $indent);
-        }
-
-        return;
+        $this->getEm()->flush();
     }
 
     private function displayMessage($message = '')

@@ -10,7 +10,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * @ORM\Entity
  * @ORM\Table(name="binder")
  * @ORM\Entity(repositoryClass="Gedmo\Tree\Entity\Repository\MaterializedPathRepository")
- * @Gedmo\SoftDeleteable(fieldName="deletedOn", timeAware=false)
+ * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
  * @Gedmo\Tree(type="materializedPath")
  */
 class Binder
@@ -63,20 +63,40 @@ class Binder
      * @Gedmo\Timestampable(on="create")
      * @var \DateTime
      */
-    private $createdOn;
+    private $createdAt;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     * @Gedmo\Blameable(on="create")
+     * @var string
+     */
+    private $createdBy;
 
     /**
      * @ORM\Column(type="datetime")
      * @Gedmo\Timestampable(on="update")
      * @var \DateTime
      */
-    private $updatedOn;
+    private $updatedAt;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     * @Gedmo\Blameable(on="update")
+     * @var string
+     */
+    private $updatedBy;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
      * @var \DateTime
      */
-    private $deletedOn;
+    private $deletedAt;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     * @var \DateTime
+     */
+    private $deletedBy;
 
     /**
      * @return int
@@ -135,5 +155,4 @@ class Binder
     {
         return $this->children;
     }
-
 }
