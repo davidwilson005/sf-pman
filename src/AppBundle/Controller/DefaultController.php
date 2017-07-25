@@ -3,20 +3,102 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Binder;
+use AppBundle\Entity\Facility;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
+use Symfony\Component\Security\Acl\Permission\MaskBuilder;
 
 class DefaultController extends Controller
 {
+
     /**
-     * @Route("/admin")
+     * @Route("/soft")
+     */
+    public function soft()
+    {
+
+        /*$binder = new Binder();
+        $binder->setName('Instruction Manual');
+
+        $facility = new Facility();
+        $facility->setName('Corporate');
+        $facility->setShortName('CORP');
+        $facility->setAddress('123 Fake St.');
+        $facility->setCity('Denver');
+        $facility->setState('CO');
+        $facility->setZip('80210');
+        $binder->addFacility($facility);
+        $this->getEm()->persist($facility);
+
+        $facility2 = new Facility();
+        $facility2->setName('Golden Branch');
+        $facility2->setShortName('GLDN');
+        $facility2->setAddress('217 Araphoe St.');
+        $facility2->setCity('Golden');
+        $facility2->setState('CO');
+        $facility2->setZip('80403');
+        $binder->addFacility($facility2);
+        $this->getEm()->persist($facility2);
+
+        $this->getEm()->persist($binder);
+        $this->getEm()->flush();*/
+
+        /*$facility = $this->getEm()->find('AppBundle:Facility', 2);
+        $this->getEm()->remove($facility);
+        $this->getEm()->flush();*/
+
+
+        //$binder = $this->getEm()->find('AppBundle:Binder', 1);
+
+        $filter = $this->getEm()->getFilters()->getFilter('softdeleteable');
+        $filter->disableForEntity('AppBundle\Entity\Facility');
+
+        $binder = $this->getEm()->createQuery('SELECT b, f FROM AppBundle:Binder b JOIN b.facilities f')->getOneOrNullResult();
+
+        $message = '';
+        foreach ($binder->getFacilities() as $facility) {
+            $message .= $facility->getName() . ' (' . $facility->getShortName() . ') <br />';
+        }
+
+
+        return $this->render('default/message.html.twig', ['message' => $message]);
+    }
+
+    /**
+     * @Route("/admin/test")
      *
      * @return Response
      */
     public function adminAction()
     {
+        var_dump($this->getUser());
+
         return $this->displayMessage('admin');
+    }
+
+    /**
+     * @Route("/acl")
+     */
+    public function acl()
+    {
+        $binder = $this->getEm()->find('AppBundle:Binder', 1);
+
+        // creating the ACL
+        $aclProvider = $this->get('security.acl.provider');
+        $objectIdentity = ObjectIdentity::fromDomainObject($binder);
+        $acl = $aclProvider->createAcl($objectIdentity);
+
+        // retrieving the security identity of the currently logged-in user
+        $tokenStorage = $this->get('security.token_storage');
+        $user = $tokenStorage->getToken()->getUser();
+        $securityIdentity = UserSecurityIdentity::fromAccount($user);
+
+        // grant owner access
+        $acl->insertObjectAce($securityIdentity, MaskBuilder::MASK_OWNER);
+        $aclProvider->updateAcl($acl);
     }
 
     /**
@@ -26,7 +108,7 @@ class DefaultController extends Controller
      */
     public function indexAction()
     {
-        return $this->displayMessage('index');
+        return $this->render('default/home.html.twig');
     }
 
     /**
@@ -38,6 +120,28 @@ class DefaultController extends Controller
     {
         $binder = new Binder();
         $binder->setName('Test' . rand(1, 100));
+
+        $this->getEm()->persist($binder);
+        $this->getEm()->flush();
+
+        return $this->displayMessage('Binder has been created');
+    }
+
+    /**
+     * @Route("/addblank")
+     *
+     * @return Response
+     */
+    public function addBlankAction()
+    {
+        $binder = new Binder();
+        $binder->setName('');
+
+        // validate
+        $validator = $this->get('validator');
+        $errors = $validator->validate($binder);
+        var_dump($errors);
+        exit;
 
         $this->getEm()->persist($binder);
         $this->getEm()->flush();

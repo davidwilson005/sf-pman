@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Binder</h1>
+
+    <table>
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ binder.id }}</td>
+            </tr>
+            <tr>
+                <th>Path</th>
+                <td>{{ binder.path }}</td>
+            </tr>
+            <tr>
+                <th>Name</th>
+                <td>{{ binder.name }}</td>
+            </tr>
+            <tr>
+                <th>Level</th>
+                <td>{{ binder.level }}</td>
+            </tr>
+            <tr>
+                <th>Createdat</th>
+                <td>{% if binder.createdAt %}{{ binder.createdAt|date('Y-m-d H:i:s') }}{% endif %}</td>
+            </tr>
+            <tr>
+                <th>Createdby</th>
+                <td>{{ binder.createdBy }}</td>
+            </tr>
+            <tr>
+                <th>Updatedat</th>
+                <td>{% if binder.updatedAt %}{{ binder.updatedAt|date('Y-m-d H:i:s') }}{% endif %}</td>
+            </tr>
+            <tr>
+                <th>Updatedby</th>
+                <td>{{ binder.updatedBy }}</td>
+            </tr>
+            <tr>
+                <th>Deletedat</th>
+                <td>{% if binder.deletedAt %}{{ binder.deletedAt|date('Y-m-d H:i:s') }}{% endif %}</td>
+            </tr>
+            <tr>
+                <th>Deletedby</th>
+                <td>{{ binder.deletedBy }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('binder_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('binder_edit', { 'id': binder.id }) }}">Edit</a>
+        </li>
+        <li>
+            {{ form_start(delete_form) }}
+                <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}

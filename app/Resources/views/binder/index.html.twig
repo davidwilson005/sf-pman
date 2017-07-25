@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Binders list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Path</th>
+                <th>Name</th>
+                <th>Level</th>
+                <th>Createdat</th>
+                <th>Createdby</th>
+                <th>Updatedat</th>
+                <th>Updatedby</th>
+                <th>Deletedat</th>
+                <th>Deletedby</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for binder in binders %}
+            <tr>
+                <td><a href="{{ path('binder_show', { 'id': binder.id }) }}">{{ binder.id }}</a></td>
+                <td>{{ binder.path }}</td>
+                <td>{{ binder.name }}</td>
+                <td>{{ binder.level }}</td>
+                <td>{% if binder.createdAt %}{{ binder.createdAt|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{{ binder.createdBy }}</td>
+                <td>{% if binder.updatedAt %}{{ binder.updatedAt|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{{ binder.updatedBy }}</td>
+                <td>{% if binder.deletedAt %}{{ binder.deletedAt|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{{ binder.deletedBy }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('binder_show', { 'id': binder.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('binder_edit', { 'id': binder.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('binder_new') }}">Create a new binder</a>
+        </li>
+    </ul>
+{% endblock %}

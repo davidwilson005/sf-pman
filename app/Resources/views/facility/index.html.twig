@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Facilities list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Shortname</th>
+                <th>Address</th>
+                <th>City</th>
+                <th>State</th>
+                <th>Zip</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for facility in facilities %}
+            <tr>
+                <td><a href="{{ path('facility_show', { 'id': facility.id }) }}">{{ facility.id }}</a></td>
+                <td>{{ facility.name }}</td>
+                <td>{{ facility.shortName }}</td>
+                <td>{{ facility.address }}</td>
+                <td>{{ facility.city }}</td>
+                <td>{{ facility.state }}</td>
+                <td>{{ facility.zip }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('facility_show', { 'id': facility.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('facility_edit', { 'id': facility.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('facility_new') }}">Create a new facility</a>
+        </li>
+    </ul>
+{% endblock %}

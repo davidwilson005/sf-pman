@@ -2,8 +2,10 @@
 
 namespace AppBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
@@ -34,10 +36,17 @@ class Binder
 
     /**
      * @ORM\Column(type="string")
+     * @Assert\NotBlank()
      * @Gedmo\Versioned
      * @var string
      */
     private $name;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="Facility", inversedBy="binders", fetch="EAGER")
+     * @var ArrayCollection
+     */
+    private $facilities;
 
     /**
      * @ORM\ManyToOne(targetEntity="Binder", inversedBy="children")
@@ -100,6 +109,11 @@ class Binder
      */
     private $deletedBy;
 
+    public function __construct()
+    {
+        $this->facilities = new ArrayCollection();
+    }
+
     /**
      * @return int
      */
@@ -108,10 +122,15 @@ class Binder
         return $this->id;
     }
 
+    public function getFacilities()
+    {
+        return $this->facilities;
+    }
+
     /**
      * @return string
      */
-    public function getName(): string
+    public function getName()
     {
         return $this->name;
     }
@@ -135,5 +154,14 @@ class Binder
     public function setParent(Binder $parent = null)
     {
         $this->parent = $parent;
+    }
+
+    public function addFacility(Facility $facility)
+    {
+        if ($this->facilities->contains($facility)) {
+            return;
+        }
+
+        $this->facilities[] = $facility;
     }
 }
